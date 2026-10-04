@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#09111f">
+  <meta name="description" content="TrustLens is an explainable heuristic cybersecurity analysis platform for reviewing message and URL warning signs offline.">
+  <title>{% block title %}TrustLens{% endblock %} · Explainable Security</title>
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v='4') }}">
+  <script defer src="{{ url_for('static', filename='js/app.js', v='4') }}"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <a class="brand" href="{{ url_for('index') }}" aria-label="TrustLens home">
+      <span class="brand-mark" aria-hidden="true">T</span><span>trust<span class="brand-accent">lens</span></span>
+    </a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">Menu</button>
+    <nav id="site-nav" class="site-nav" aria-label="Main navigation">
+      <a {% if request.endpoint == 'index' %}aria-current="page"{% endif %} href="{{ url_for('index') }}">Dashboard</a>
+      <a {% if request.endpoint == 'analyze' %}aria-current="page"{% endif %} href="{{ url_for('analyze') }}">Analyze</a>
+      <a {% if request.endpoint in ['history', 'result'] %}aria-current="page"{% endif %} href="{{ url_for('history') }}">History</a>
+      <a {% if request.endpoint in ['reports', 'report'] %}aria-current="page"{% endif %} href="{{ url_for('reports') }}">Reports</a>
+      <a {% if request.endpoint == 'simulation' %}aria-current="page"{% endif %} href="{{ url_for('simulation') }}">Simulation Lab</a>
+      <a {% if request.endpoint == 'about' %}aria-current="page"{% endif %} href="{{ url_for('about') }}">About</a>
+    </nav>
+    <span class="offline-indicator"><span></span> Offline analysis</span>
+  </header>
+  <main id="main" class="page-shell">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-stack" role="status">
+          {% for category, message in messages %}
+            <div class="flash {{ category }}" {% if category == 'error' %}role="alert"{% endif %}>{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="site-footer">
+    <span>TrustLens · An explainable heuristic cybersecurity analysis platform</span>
+    <span>Indicators are heuristics, not verification.</span>
+  </footer>
+</body>
+</html>

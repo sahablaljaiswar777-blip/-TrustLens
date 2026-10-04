@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Analyze{% endblock %}
+{% block content %}
+<div class="page-heading"><p class="eyebrow">OFFLINE INSPECTION</p><h1>Analyze a message or destination</h1><p>TrustLens is an explainable heuristic cybersecurity analysis platform. Choose what you want to inspect; all checks happen locally and submitted links are never visited.</p></div>
+<div class="input-type-nav" aria-label="Choose an input type">
+  <a href="#message" class="input-type-card"><span aria-hidden="true">01</span><strong>Message</strong><small>Language & pressure cues</small></a>
+  <a href="#url" class="input-type-card"><span aria-hidden="true">02</span><strong>URL / QR</strong><small>Address string only</small></a>
+  <a href="#sender" class="input-type-card"><span aria-hidden="true">03</span><strong>Sender</strong><small>Text comparison only</small></a>
+</div>
+<form class="analysis-form panel" method="post" action="{{ url_for('analyze') }}" data-submit-confirm>
+  <div class="form-section"><div class="form-section-title"><span class="step-number">01</span><div><h2>Message &amp; context</h2><p>Inspect urgency, credential requests, payment language, and persuasion cues. Avoid entering personal secrets.</p></div></div>
+    <label for="message">Message text <span class="optional">OPTIONAL</span></label>
+    <textarea id="message" name="message" rows="5" maxlength="4000" placeholder="Paste the message text here…" data-count>{{ values.get('message', '') }}</textarea><div class="field-meta"><span>Common language patterns are checked locally.</span><span data-counter>0 / 4000</span></div>
+    <label for="email_context">Subject or surrounding context <span class="optional">OPTIONAL</span></label>
+    <textarea id="email_context" name="email_context" rows="3" maxlength="4000" placeholder="Subject, surrounding context, or other relevant text…">{{ values.get('email_context', '') }}</textarea>
+  </div>
+  <div class="form-section"><div class="form-section-title"><span class="step-number">02</span><div><h2>Link destination</h2><p>Paste a displayed URL or a destination already decoded by your QR reader. No DNS, redirects, or page contents are checked.</p></div></div>
+    <div class="two-col"><div><label for="url">Message or email URL <span class="optional">OPTIONAL</span></label><input id="url" name="url" type="text" maxlength="2048" autocomplete="url" placeholder="https://example.test/path" value="{{ values.get('url', '') }}"></div>
+    <div><label for="qr_url">Decoded QR destination <span class="optional">OPTIONAL</span></label><input id="qr_url" name="qr_url" type="text" maxlength="2048" placeholder="Paste decoded destination" value="{{ values.get('qr_url', '') }}"></div></div>
+  </div>
+  <div class="form-section"><div class="form-section-title"><span class="step-number">03</span><div><h2>Sender identity clues</h2><p>We can compare supplied text with the claimed organization; this does not authenticate the sender.</p></div></div>
+    <div class="two-col"><div><label for="sender">Displayed sender or email <span class="optional">OPTIONAL</span></label><input id="sender" name="sender" type="text" maxlength="320" autocomplete="off" placeholder="name@example.test" value="{{ values.get('sender', '') }}"></div>
+    <div><label for="claimed_organization">Claimed organization <span class="optional">OPTIONAL</span></label><input id="claimed_organization" name="claimed_organization" type="text" maxlength="160" placeholder="Organization name" value="{{ values.get('claimed_organization', '') }}"></div></div>
+  </div>
+  <div class="form-submit"><p><span class="privacy-mark" aria-hidden="true">⌑</span> Local string inspection only. History saves a short preview and structured signals, not full form contents.</p><button class="button primary analyze-submit" type="submit"><span class="submit-label">Run offline analysis</span><span class="submit-arrow" aria-hidden="true">→</span></button></div>
+</form>
+<p class="form-footnote">Only analyze content you have permission to review. Remove passwords, one-time codes, and personal data before submitting.</p>
+{% endblock %}

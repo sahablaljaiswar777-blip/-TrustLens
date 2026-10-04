@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}{% if report_mode %}Printable report{% else %}Analysis result{% endif %}{% endblock %}
+{% block content %}
+<div class="result-topline">
+  <a class="back-link" href="{% if report_mode %}{{ url_for('reports') }}{% else %}{{ url_for('history') }}{% endif %}">← {% if report_mode %}Reports{% else %}History{% endif %}</a>
+  <div class="result-actions"><a class="button secondary small-button" href="{{ url_for('analyze') }}">New analysis</a>{% if not report_mode %}<a class="button secondary small-button" href="{{ url_for('report', analysis_id=analysis.id) }}">Print-friendly report</a>{% endif %}<button class="button secondary small-button print-button" type="button" onclick="window.print()">Print report</button></div>
+</div>
+<div class="report-brand"><span class="brand-mark" aria-hidden="true">T</span><span>TrustLens</span><small>Explainable heuristic cybersecurity analysis platform</small></div>
+<div class="result-heading"><div><p class="eyebrow">{% if report_mode %}PRINT-FRIENDLY ANALYSIS REPORT{% else %}ANALYSIS RESULT{% endif %} · #{{ analysis.id }}</p><h1>{{ analysis.title }}</h1><time datetime="{{ analysis.created_at }}">{{ analysis.created_at[:19]|replace('T', ' ') }} UTC</time></div><div class="result-classification"><span class="risk-pill band-{{ analysis.band|lower|replace(' ', '-') }}">{{ analysis.band }}</span><span class="decision-chip decision-{{ analysis.decision|lower|replace(' ', '-') }}">Decision: {{ analysis.decision }}</span></div></div>
+<section class="result-grid">
+  <article class="score-card panel state-{{ analysis.band|lower|replace(' ', '-') }}">
+    <div class="score-header"><div><p class="eyebrow">TRUST SCORE <span class="heuristic-label">HEURISTIC</span></p><h2>{{ analysis.result.decision }}</h2><span class="score-classification">{{ analysis.band }} · {{ analysis.result.decision }}</span></div><span class="score-number">{{ analysis.score }}<small>/100</small></span></div>
+    <div class="meter" role="meter" aria-label="Heuristic risk score" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ analysis.score }}"><div class="meter-track"><div class="meter-fill" style="--score: {{ analysis.score }}%"></div></div><div class="meter-labels"><span>0 · TRUST</span><span>100 · CRITICAL</span></div></div>
+    <p class="decision-explanation">{{ analysis.result.explanation }}</p>
+    <div class="recommendation"><span class="recommendation-icon">↗</span><div><strong>Recommended next step</strong><p>{{ analysis.result.recommendation }}</p></div></div>
+  </article>
+  <aside class="evidence-card panel"><p class="eyebrow">EVIDENCE PATH</p><h2>Signal → contribution → decision</h2><ol class="evidence-path"><li><span>01</span><div><strong>Message & URL parsing</strong><small>Submitted strings only · no link access</small></div></li><li><span>02</span><div><strong>{{ analysis.result.signal_count }} signal{% if analysis.result.signal_count != 1 %}s{% endif %} identified</strong><small>{{ analysis.result.categories|join(', ') if analysis.result.categories else 'No warning categories matched' }}</small></div></li><li><span>03</span><div><strong>Points combined and capped</strong><small>Deterministic correlation · maximum 100</small></div></li><li><span>04</span><div><strong>{{ analysis.result.band }} → {{ analysis.result.decision }}</strong><small>Decision and guidance for this score range</small></div></li></ol>
+  </aside>
+</section>
+<section class="section-block signal-section"><div class="section-heading"><div><p class="eyebrow">TRANSPARENT INDICATORS</p><h2>Signals → risk contribution → decision</h2><p class="section-subtitle">Each row explains why points contributed to the combined {{ analysis.score }}/100 score and {{ analysis.result.decision }} guidance.</p></div><span class="muted">{{ analysis.result.signal_count }} found</span></div>
+{% if analysis.result.signals %}
+<div class="signal-list">{% for signal in analysis.result.signals %}<article class="signal-row"><span class="signal-marker severity-{{ signal.severity }}" aria-hidden="true"></span><div class="signal-main"><div class="signal-title"><h3>{{ signal.name|replace('_', ' ')|title }}</h3><span class="category-tag">{{ signal.category|replace('_', ' ') }}</span><span class="severity-tag severity-text-{{ signal.severity }}">{{ signal.severity }}</span></div><p>{{ signal.reason }}</p></div><div class="signal-contribution"><span>Risk contribution</span><strong>+{{ signal.points }}<small> / 100</small></strong></div></article>{% endfor %}</div>
+{% else %}<div class="empty-state compact"><div class="empty-icon">✓</div><h3>No matching warning patterns</h3><p>This is not proof that the content is authentic or safe.</p></div>{% endif %}
+</section>
+<div class="report-recommendation"><span class="recommendation-icon" aria-hidden="true">↗</span><div><strong>Defense recommendation</strong><p>{{ analysis.result.recommendation }}</p></div></div>
+<div class="disclaimer-banner"><strong>Important limitation</strong><p>{{ analysis.result.heuristic_notice }} A low score is not a guarantee of safety. Sender identity and website ownership are not independently verified.</p></div>
+{% endblock %}

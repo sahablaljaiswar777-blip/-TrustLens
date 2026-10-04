@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Simulations{% endblock %}
+{% block content %}
+<div class="page-heading"><p class="eyebrow">LEARN BY EXAMPLE</p><h1>Fictional training scenarios</h1><p>Explore common warning signs with safe, reserved example domains. Scenarios are educational only; no links are contacted and no attack functionality is present.</p></div>
+<section class="simulation-flow panel" aria-label="TrustLens analysis flow">
+  <p class="eyebrow">THE TRUSTLENS ANALYSIS PIPELINE</p>
+  <ol class="pipeline-steps">
+    <li><span>01</span><strong>Message<br>received</strong></li><li aria-hidden="true">→</li>
+    <li><span>02</span><strong>Local<br>analysis</strong></li><li aria-hidden="true">→</li>
+    <li><span>03</span><strong>Signal<br>detection</strong></li><li aria-hidden="true">→</li>
+    <li><span>04</span><strong>Correlation</strong></li><li aria-hidden="true">→</li>
+    <li><span>05</span><strong>Risk<br>score</strong></li><li aria-hidden="true">→</li>
+    <li><span>06</span><strong>Decision</strong></li><li aria-hidden="true">→</li>
+    <li><span>07</span><strong>Defense<br>recommendation</strong></li>
+  </ol>
+</section>
+<div class="simulation-grid">{% for key, scenario in simulations.items() %}<article class="simulation-card panel"><div class="simulation-icon" aria-hidden="true">{% if key == 'delivery' %}▣{% elif key == 'workplace' %}▤{% else %}◈{% endif %}</div><p class="eyebrow">TRAINING SCENARIO 0{{ loop.index }}</p><h2>{{ scenario.title }}</h2><p>{{ scenario.email_context }}</p><div class="scenario-preview"><span>From</span><code>{{ scenario.sender }}</code><span>Message</span><p>{{ scenario.message }}</p>{% if scenario.url %}<span>URL string</span><code>{{ scenario.url }}</code>{% endif %}</div><form method="post" action="{{ url_for('simulation') }}" data-scan-form><input type="hidden" name="scenario" value="{{ key }}"><button class="button secondary" type="submit"><span class="submit-label">Run safe analysis</span><span class="submit-arrow" aria-hidden="true">→</span></button></form></article>{% endfor %}</div>
+<div class="disclaimer-banner"><strong>Reserved domains only</strong><p>Demonstration names use the special-use <code>.test</code> and <code>.example</code> suffixes and are not real destinations. TrustLens does not resolve or request them.</p></div>
+{% endblock %}

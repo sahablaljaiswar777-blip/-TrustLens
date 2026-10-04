@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="hero-copy">
+    <p class="eyebrow"><span class="pulse-dot"></span> SYSTEM OPERATIONAL · OFFLINE ANALYSIS</p>
+    <h1>Think Before<br><span class="gradient-text">You Trust.</span></h1>
+    <p class="hero-lead">An explainable heuristic cybersecurity analysis platform. Review messages, URLs, sender details, and QR destinations with transparent local checks. Submitted links are never opened.</p>
+    <div class="hero-actions">
+      <a class="button primary" href="{{ url_for('analyze') }}">Analyze a message <span aria-hidden="true">→</span></a>
+      <a class="button secondary" href="{{ url_for('simulation') }}">Open Simulation Lab</a>
+    </div>
+  </div>
+  <div class="hero-visual" aria-hidden="true">
+    <div class="scan-ring ring-one"></div><div class="scan-ring ring-two"></div>
+    <div class="lens-card"><div class="lens-icon">⌕</div><div class="lens-line long"></div><div class="lens-line"></div><div class="lens-status"><span></span> local inspection</div></div>
+    <div class="floating-chip chip-a">No URL fetching</div><div class="floating-chip chip-b">Signal → Decision</div>
+  </div>
+</section>
+<section class="stats-grid" aria-label="Dashboard statistics">
+  <article class="stat-card"><span class="stat-icon" aria-hidden="true">⌁</span><span class="stat-label">Total analyses</span><strong>{{ stats.total }}</strong><span class="stat-hint">Saved locally in SQLite</span></article>
+  <article class="stat-card"><span class="stat-icon warning-icon" aria-hidden="true">!</span><span class="stat-label">High-risk detections</span><strong>{{ stats.high_risk }}</strong><span class="stat-hint">Score 80 or higher · heuristic</span></article>
+  <article class="stat-card"><span class="stat-icon trusted-icon" aria-hidden="true">✓</span><span class="stat-label">Trusted-range results</span><strong>{{ stats.trusted }}</strong><span class="stat-hint">Score 0–19 · not a safety guarantee</span></article>
+</section>
+<section class="section-block">
+  <div class="section-heading"><div><p class="eyebrow">YOUR WORKSPACE</p><h2>Recent activity</h2></div><a class="text-link" href="{{ url_for('history') }}">View history →</a></div>
+  {% if stats.recent %}
+  <div class="table-wrap"><table><thead><tr><th>Analysis</th><th>Risk band</th><th>Score</th><th></th></tr></thead><tbody>
+    {% for item in stats.recent %}
+    <tr><td><span class="table-title">{{ item.title }}</span><small><time datetime="{{ item.created_at }}">{{ item.created_at[:19]|replace('T', ' ') }} UTC</time></small></td><td><span class="risk-pill band-{{ item.band|lower|replace(' ', '-') }}">{{ item.band }}</span></td><td><div class="table-score"><span class="mini-meter"><span style="width:{{ item.score }}%"></span></span><strong>{{ item.score }}</strong><small>/100</small></div></td><td><a class="text-link" href="{{ url_for('result', analysis_id=item.id) }}">Open <span class="sr-only">{{ item.title }}</span> →</a></td></tr>
+    {% endfor %}
+  </tbody></table></div>
+  {% else %}
+  <div class="empty-state"><div class="empty-icon">◎</div><h3>A clear view starts here</h3><p>Your saved analyses will appear here. Start with a message, URL, or training scenario.</p><a href="{{ url_for('analyze') }}" class="button secondary">Analyze something</a></div>
+  {% endif %}
+</section>
+<section class="trust-note"><span class="trust-icon" aria-hidden="true">i</span><p><strong>Heuristic analysis, not a verdict.</strong> TrustLens surfaces explainable warning signs; it cannot prove who sent something or certify a destination as safe.</p><a href="{{ url_for('about') }}">How it works →</a></section>
+{% endblock %}
